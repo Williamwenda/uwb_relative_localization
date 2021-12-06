@@ -118,7 +118,8 @@ int test_camera()
         printf("Uart open failed !\n");
         pmsis_exit(-1);
     }
-    pi_uart_read_async(&uart, buff_uart_rcv, UART_RCV_SIZE, pi_task_callback(&taskUart, (void *) uart_rx_cb, NULL));
+    // [change]
+    // pi_uart_read_async(&uart, buff_uart_rcv, UART_RCV_SIZE, pi_task_callback(&taskUart, (void *) uart_rx_cb, NULL));
     printf("Start receiving !\n");
     
     // ------ open camera
@@ -206,7 +207,7 @@ int test_camera()
         // }
         // previousRoll = roll;      // [consider to change]
         image_number ++;
-        printf("image num: %05d\n", image_number);
+        // printf("image num: %05d\n", image_number);
 #else
         for (uint32_t i=0; i<BUFF_SIZE; i++){buff[i] = 0;}
         pi_flash_read(&flash, flash_address, buff, (uint32_t) CROP_SIZE);
@@ -222,7 +223,7 @@ int test_camera()
             pi_open_from_conf(&fs, &conf);
             if (pi_fs_mount(&fs))
                 return -1;
-            void *File = pi_fs_open(&fs, "../../../images/label.txt", PI_FS_FLAGS_WRITE);
+            // void *File = pi_fs_open(&fs, "../../../images/label.txt", PI_FS_FLAGS_WRITE);
             char line_data[100];
             flash_address = CROP_SIZE;
 
@@ -231,15 +232,17 @@ int test_camera()
                 flash_address += (CROP_SIZE+PACKET_SIZE);
                 // decode_packet(buff_packet, &roll, &pitch, &pos_x, &pos_y, &pos_z, &pos_d);
 
+                if (false){
                 decode_packet(buff_packet, &cf_tick, &pos_z, &acc_z, &gyro_x, &gyro_y, &gyro_z);  // cf_tick, pos_z, acc_z, gyro_x, gyro_y, gyro_z;
 
                 sprintf(line_data, "img%05d.ppm %f %f %f %f %f %f\n", i,\
                     cf_tick, pos_z, acc_z, gyro_x, gyro_y, gyro_z);                                     // 
                 int size_line_data = 0;
                 while(line_data[size_line_data]!='\n'){size_line_data++;}
-                pi_fs_write(File, line_data, size_line_data+1);
+                // pi_fs_write(File, line_data, size_line_data+1);
+                }
             }
-            pi_fs_close(File);
+            // pi_fs_close(File);
             pi_fs_unmount(&fs);
 
             pi_flash_close(&flash);
