@@ -53,7 +53,7 @@ char image_name[13];
 static uint16_t image_number = 0;    
 static float previousRoll;
 float cf_tick, pos_z;
-static bool start_storing = true;
+static bool start_storing = false;
 
 static float decode_packet(uint8_t *src, float * cf_tick, float * pos_z);
 static float buff_strip(uint8_t *src, uint8_t *tar);
@@ -317,7 +317,12 @@ void uart_rx_cb(void *arg)
     buff_strip(buff_uart_rcv, buff_packet);
 
     decode_packet(buff_packet, &cf_tick, &pos_z); 
-    if(pos_z > 0.3f){ start_storing = true;}
+    if(pos_z == 1.0){ start_storing = true;}
+    else if(pos_z == 0.0){start_storing = false;}
+    else{
+        printf("Wrong param for ai-deck logging\n");
+        start_storing = false;
+    }
 
     // printf("tick: %f, pos_z: %f \n", cf_tick, pos_z);
 
